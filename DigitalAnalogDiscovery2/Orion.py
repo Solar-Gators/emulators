@@ -1,9 +1,13 @@
+import importlib
 import ctypes
 import random
 
-class OrionData():
-    def __init__(self, addr):
-        self.addr = addr
+importlib.import_module("../!Classes/Message")
+
+class OrionData(Message):
+    def __init__(self, addr_CAN, addr_telem):
+        self.addr_CAN = addr_CAN
+        self.addr_telem = addr_telem
         self.lowCell = random.uniform(2.5, 4.3)
         self.highCell = random.uniform(2.5, 4.3)
         self.avgCell = random.uniform(2.5, 4.3)
@@ -13,17 +17,13 @@ class OrionData():
             print(str(round(name[1], 2)))
     def toCharArray(self):
         r = []
-        r.append(self.addr)
-        i = 0
         for name in self.__dict__.items():
-            if name[0] == "addr":
+            if name[0].startswith("addr"):
                 continue
             temp = int(name[1]*10000)
             r.append(temp & 0xFF)
             r.append((temp >> 8) & 0xFF)
-            i = i+1
-        r.insert(1, i*2)
         return r
-    def toCharArray_c(self):
-        tmp = self.toCharArray()
-        return (ctypes.c_char * len(tmp))(*tmp), len(tmp)
+    def toRFDmsg(self):
+        temp = self.toCharArray()
+        return toCharArray_c(temp), len(temp)

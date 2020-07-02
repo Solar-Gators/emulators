@@ -16,7 +16,7 @@ class Proton1Data():
         r.append(self.addr)
         i = 0
         for name in self.__dict__.items():
-            if name[0] == "addr":
+            if name[0].startswith("addr"):
                 continue
             temp = int(name[1]*10000)
             r.append(temp & 0xFF)

@@ -7,13 +7,6 @@ import time
 # All data is sent from telemetry as uint8_t
 # Data is sent lsByte first
 # Order is derived from X_MESSAGE_0::dataPacketToArray
-class OrionData(Structure):
-    _fields_ = ("lowCell", c_uint), ("highCell", c_uint), ("avgCell", c_uint), ("packSumVoltage", c_uint)
-    def toArray_8(self):
-        pass
-
-class Proton1Data(Structure):
-    _fields_ = ("vin", c_uint), ("vout", c_uint), ("iin", c_uint), ("temp", c_uint)
 
 class MitsubaData(Structure):
     _fields_ = ("rpm", c_int), ("temp", c_int), ("FET_oh_level", c_int)
