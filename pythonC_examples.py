@@ -5,7 +5,7 @@ import Orion
 # index 0 ... index n
 
 
-Orion.OrionBMS = Orion.OrionData(0x12)
+OrionBMS = Orion.OrionData(0x12)
 arr, size = OrionBMS.toCharArray_c()
 print(arr)
 print(size)
