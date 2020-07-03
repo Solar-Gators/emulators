@@ -1,6 +1,6 @@
 import time
 from DAD.DAD import DAD
-from .Mocks import BNO555, Orion, Mitsuba, Proton1, GPS
+from Mocks.Orion import Orion
 
 BMS = Orion(0x1234, 0x2)
 # MPPT1 = Proton1(0x3456, 0x1)
@@ -11,9 +11,13 @@ emulator = DAD("UART")
 
 print("Sending data...")
 
-try:
-    while True:
-        time.sleep(0.01)
-        emulator.sendData(BMS.toPitRFDmsg())
-except KeyboardInterrupt: # wait for ctrl-c
-    pass
+if __name__ == "__main__":
+    i = 0
+    try:
+        while i < 5:
+            time.sleep(0.01)
+            emulator.sendData(BMS.toPitRFDmsg())
+            i = i + 1
+            print(i)
+    except KeyboardInterrupt: # wait for ctrl-c
+        pass

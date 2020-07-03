@@ -1,8 +1,7 @@
 import importlib
 import ctypes
 import random
-from Message import Message
-importlib.import_module("../!Classes/Message")
+from .Message import Message
 
 class Orion(Message):
     def __init__(self, addr_CAN, addr_telem):
@@ -28,4 +27,4 @@ class Orion(Message):
         temp = self.toCharArray()
         temp.insert(0, self.addr_telem)
         temp.insert(1, len(temp)-1)
-        return 
+        return temp
