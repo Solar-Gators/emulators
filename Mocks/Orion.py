@@ -1,10 +1,10 @@
 import importlib
 import ctypes
 import random
-
+from Message import Message
 importlib.import_module("../!Classes/Message")
 
-class OrionData(Message):
+class Orion(Message):
     def __init__(self, addr_CAN, addr_telem):
         self.addr_CAN = addr_CAN
         self.addr_telem = addr_telem
@@ -24,6 +24,8 @@ class OrionData(Message):
             r.append(temp & 0xFF)
             r.append((temp >> 8) & 0xFF)
         return r
-    def toRFDmsg(self):
+    def toPitRFDmsg(self):
         temp = self.toCharArray()
-        return toCharArray_c(temp), len(temp)
+        temp.insert(0, self.addr_telem)
+        temp.insert(1, len(temp)-1)
+        return 

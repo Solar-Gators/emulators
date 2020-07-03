@@ -1,15 +1,6 @@
 from abc import ABC, abstractmethod 
 import ctypes
 
-# toCharArray_c
-# @desc:    takes the items in a class and outputs them to an array with sizes no larger
-#           than a char in the order that is defined in X_MESSAGE_0::dataPacketToArray
-# @param:   none
-# @returns: a tuple where the first element is the c array and the second is the size
-@staticmethod
-def toCharArray_c(arr):
-    return (ctypes.c_char * len(arr))(*arr), len(arr)
-
 class Message(ABC):
     @abstractmethod
     def print(self):

@@ -2,7 +2,15 @@ import ctypes
 import math
 import sys
 import time
-from UART import UART
+from .UART import UART
+
+# toCharArray_c
+# @desc:    takes the items in a class and outputs them to an array with sizes no larger
+#           than a char in the order that is defined in X_MESSAGE_0::dataPacketToArray
+# @param:   none
+# @returns: a tuple where the first element is the c array and the second is the size
+def c_toCharArray(arr):
+    return (ctypes.c_char * len(arr))(*arr)
 
 class DAD():
     def __init__(self, com_type):
@@ -26,7 +34,7 @@ class DAD():
             print(str(szerr.value))
             quit()
         if com_type == "UART":
-            self.protocol = UART(ctypes.byref(self.dwf), ctypes.byref(hdwf))
+            self.protocol = UART(self.dwf, hdwf)
         elif com_type == "CAN":
             pass
         elif com_type == "SPI":
@@ -36,7 +44,11 @@ class DAD():
         else:
             print("invalid comunication protocol.")
             quit()
-    def sendData(self, data, size):
-        self.protocol.send(data, size)
+    def __del__(self):
+        self.dwf.FDwfDeviceCloseAll()
+
+    def sendData(self, arr):
+        self.protocol.send(c_toCharArray(arr), ctypes.c_int(len(arr)))
+
     def receiveData(self):
         return self.protocol.receive()

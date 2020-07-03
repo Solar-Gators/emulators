@@ -1,7 +1,7 @@
-from Protocol import Protocol
+from .Protocol import Protocol
 import ctypes
 import time
-BAUDRATE = 9600
+BAUDRATE = 256000
 TX_PIN = 0
 RX_PIN = 1
 
@@ -13,7 +13,7 @@ class UART(Protocol):
         self.cRX = ctypes.c_int(0)
         self.fParity = ctypes.c_int(0)
 
-        dwf.FDwfDigitalUartRateSet(hdwf, ctypes.c_double(9600)) # 9.6kHz
+        dwf.FDwfDigitalUartRateSet(hdwf, ctypes.c_double(BAUDRATE)) # 9.6kHz
         dwf.FDwfDigitalUartTxSet(hdwf, ctypes.c_int(0)) # TX = DIO-0
         dwf.FDwfDigitalUartRxSet(hdwf, ctypes.c_int(1)) # RX = DIO-1
         dwf.FDwfDigitalUartBitsSet(hdwf, ctypes.c_int(8)) # 8 bits
