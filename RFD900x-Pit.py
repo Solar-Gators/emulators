@@ -14,8 +14,8 @@ print("Sending data...")
 if __name__ == "__main__":
     i = 0
     try:
-        while i < 5:
-            time.sleep(0.01)
+        while True:
+            time.sleep(0.5)
             emulator.sendData(BMS.toPitRFDmsg())
             i = i + 1
             print(i)
