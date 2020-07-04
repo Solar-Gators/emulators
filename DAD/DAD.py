@@ -4,7 +4,12 @@ import sys
 import time
 from .UART import UART
 
-# toCharArray_c
+# Constatns
+STARTBYTE = 0xFF
+ENDBYTE = 0x3F
+ESCCHAR = 0x2F
+
+# @name:    toCharArray_c
 # @desc:    takes the items in a class and outputs them to an array with sizes no larger
 #           than a char in the order that is defined in X_MESSAGE_0::dataPacketToArray
 # @param:   none
@@ -48,6 +53,8 @@ class DAD():
         self.dwf.FDwfDeviceCloseAll()
 
     def sendData(self, arr):
+        arr.insert(STARTBYTE, 0)
+        arr.append(ENDBYTE)
         self.protocol.send(c_toCharArray(arr), ctypes.c_int(len(arr)))
 
     def receiveData(self):
