@@ -23,6 +23,7 @@ class Message(ABC):
 
     # @name:    toPitRFDmsg
     # @desc:    turns the data into a message as expected by the pit data collector
+    #           inserts start and end byte
     # @param:   none
     # @returns: an array to be received by the pit
     def toPitRFDmsg(self):
