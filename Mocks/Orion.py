@@ -5,8 +5,7 @@ from .Message import Message
 
 class Orion(Message):
     def __init__(self, addr_CAN, addr_telem):
-        self.addr_CAN = addr_CAN
-        self.addr_telem = addr_telem
+        super.__init__(addr_CAN, addr_telem)
         self.lowCell = random.uniform(2.5, 4.3)
         self.highCell = random.uniform(2.5, 4.3)
         self.avgCell = random.uniform(2.5, 4.3)

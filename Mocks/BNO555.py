@@ -10,6 +10,6 @@ class Axis():
 
 class BNO555(Message):
     def __init__(self, addr_CAN, addr_telem):
-        self.addr_CAN = addr_CAN
-        self.addr_telem = addr_telem
+        super.__init__(addr_CAN, addr_telem)
         self.data = []
+    
