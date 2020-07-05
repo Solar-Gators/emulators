@@ -16,11 +16,7 @@ if __name__ == "__main__":
     i = 0
     try:
         while True:
-            time.sleep(0.5)
-            data = BMS.toPitRFDmsg()
-            print(data)
-            data = GPS.toPitRFDmsg()
-            print(data)
+            time.sleep(2)
             emulator.sendData(BMS.toPitRFDmsg())
             emulator.sendData(GPS.toPitRFDmsg())
             i = i + 1

@@ -30,8 +30,9 @@ class Message(ABC):
         temp = self.toCharArray()
         temp = self.handleSpecialChars(temp)
         temp.insert(0, STARTBYTE)
-        temp.insert(1, self.addr_telem)
-        temp.insert(2, len(temp)-2)
+        temp.insert(1, 1)
+        temp.insert(2, self.addr_telem)
+        temp.insert(3, len(temp)-3)
         temp.append(ENDBYTE)
         return temp
 
@@ -39,5 +40,6 @@ class Message(ABC):
         indices = [i for i, x in enumerate(arr) if x == STARTBYTE or x == ENDBYTE or x==ESCCHAR]
         i = 0
         for index in indices:
-            arr.insert(index-1+i, ESCCHAR)
+            arr.insert(index+i, ESCCHAR)
+            i = i + 1
         return arr
