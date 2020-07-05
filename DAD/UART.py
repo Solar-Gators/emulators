@@ -1,7 +1,7 @@
 from .Protocol import Protocol
 import ctypes
 import time
-BAUDRATE = 256000
+BAUDRATE = 57600
 TX_PIN = 0
 RX_PIN = 1
 

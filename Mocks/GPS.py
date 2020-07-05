@@ -1,4 +1,4 @@
-from Message import Message
+from .Message import Message
 
 class point():
     def __init__(self, lat, lng):

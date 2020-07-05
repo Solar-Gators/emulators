@@ -1,7 +1,7 @@
 import importlib
 import ctypes
 import random
-from Message import Message
+from .Message import Message
 
 class Orion(Message):
     def __init__(self, addr_CAN, addr_telem):
