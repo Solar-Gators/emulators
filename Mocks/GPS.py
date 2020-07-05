@@ -12,7 +12,7 @@ class point():
 class GPS(Message):
     def __init__(self, addr_CAN, addr_telem, pathToData):
         self.file = open(pathToData, "r")
-        super.__init__(addr_CAN, addr_telem)
+        super().__init__(addr_CAN, addr_telem)
         self.data = []
         self.i = 0
         self.__processFile()

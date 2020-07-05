@@ -1,11 +1,11 @@
 import importlib
 import ctypes
 import random
-from .Message import Message
+from Message import Message
 
 class Orion(Message):
     def __init__(self, addr_CAN, addr_telem):
-        super.__init__(addr_CAN, addr_telem)
+        super().__init__(addr_CAN, addr_telem)
         self.lowCell = random.uniform(2.5, 4.3)
         self.highCell = random.uniform(2.5, 4.3)
         self.avgCell = random.uniform(2.5, 4.3)
@@ -22,3 +22,7 @@ class Orion(Message):
             r.append(temp & 0xFF)
             r.append((temp >> 8) & 0xFF)
         return r
+
+if __name__ == "__main__":
+    data = Orion(0xff, 0x02)
+    print(data.toPitRFDmsg())

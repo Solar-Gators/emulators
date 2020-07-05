@@ -29,8 +29,10 @@ class Message(ABC):
     def toPitRFDmsg(self):
         temp = self.toCharArray()
         temp = self.handleSpecialChars(temp)
-        temp.insert(0, self.addr_telem)
-        temp.insert(1, len(temp)-1)
+        temp.insert(0, STARTBYTE)
+        temp.insert(1, self.addr_telem)
+        temp.insert(2, len(temp)-2)
+        temp.append(ENDBYTE)
         return temp
 
     def handleSpecialChars(self, arr):
