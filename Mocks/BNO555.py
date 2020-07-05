@@ -1,4 +1,4 @@
-from Message import Message
+from .Message import Message
 
 class Axis():
     def __init__(self, x, y ,z):
@@ -11,5 +11,8 @@ class Axis():
 class BNO555(Message):
     def __init__(self, addr_CAN, addr_telem):
         super.__init__(addr_CAN, addr_telem)
-        self.data = []
-    
+        self.gyro = Axis(5, 4, 3)
+        self.accel = Axis(1, 2, 3)
+    def toCharArray(self):
+        # TODO figure out how the IMU is sending from the car 
+        pass
