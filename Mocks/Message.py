@@ -1,7 +1,14 @@
 from abc import ABC, abstractmethod 
 import ctypes
-
+# Constatns
+STARTBYTE = 0xFF
+ENDBYTE = 0x3F
+ESCCHAR = 0x2F
 class Message(ABC):
+    def __init__(self, addr_CAN, addr_telem):
+        self.addr_CAN = addr_CAN
+        self.addr_telem = addr_telem
+        
     @abstractmethod
     def print(self):
         pass
@@ -18,6 +25,16 @@ class Message(ABC):
     # @desc:    turns the data into a message as expected by the pit data collector
     # @param:   none
     # @returns: an array to be received by the pit
-    @abstractmethod
     def toPitRFDmsg(self):
-        pass
+        temp = self.toCharArray()
+        temp = self.handleSpecialChars(temp)
+        temp.insert(0, self.addr_telem)
+        temp.insert(1, len(temp)-1)
+        return temp
+
+    def handleSpecialChars(self, arr):
+        indices = [i for i, x in enumerate(arr) if x == STARTBYTE or x == ENDBYTE or x==ESCCHAR]
+        i = 0
+        for index in indices:
+            arr.insert(index-1+i, ESCCHAR)
+        return arr

@@ -1,5 +1,5 @@
-import importlib
 from Message import Message
+
 class point():
     def __init__(self, lat, lng):
         self.lat = lat
@@ -40,11 +40,6 @@ class GPS(Message):
         if(self.i >= len(self.data)):
             self.i = 0
         return r
-    def toPitRFDmsg(self):
-        temp = self.toCharArray()
-        temp.insert(0, self.addr_telem)
-        temp.insert(1, len(temp)-1)
-        return temp
 
 
 if __name__ == "__main__":

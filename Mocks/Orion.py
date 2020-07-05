@@ -23,8 +23,3 @@ class Orion(Message):
             r.append(temp & 0xFF)
             r.append((temp >> 8) & 0xFF)
         return r
-    def toPitRFDmsg(self):
-        temp = self.toCharArray()
-        temp.insert(0, self.addr_telem)
-        temp.insert(1, len(temp)-1)
-        return temp
