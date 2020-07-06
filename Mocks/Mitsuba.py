@@ -18,11 +18,20 @@ class Mitsuba(Message):
         self.accelPos = 10          # 10 bit 0.5%/LSB
         self.regenPos = 10          # 10 bit 0.5%/LSB
         self.DigiSWNum = 4          #  4 bit Digi SW Number
-        self.targetVal = 10         # 10 bit
+        self.targetVal = 10         # 10 bit CCM 0.5A LSB / PWM 0.5% LSB
         self.motorStat = 2          #  2 bit Wait/Forward/Reverse
-        self.drive = 1              #  1 bit'0' (Drive) / '1' (Regen)
+        self.drive = 1              #  1 bit '0' (Drive) / '1' (Regen)
         # Frame 2 data
         self.ADSensorErr = 21       # 16 bit
         self.PowSysErr = 8          #  8 bit
         self.MotorSysErr = 3        #  8 bit
         self.FETOHLvl = 2           #  2 bit
+    def createFrame0(self):
+        r = (self.advancedLeadAngle << 56) | (self.duty << 46) | (self.motorRspeed << 34) | \
+            (self.FETtemp << 29) | (self.motorCurrent << 19) | (self.battCurrentDir << 18) | \
+            (self.battCurrent << 9) | self.battVoltage
+        return r
+    def createFrame1(self):
+        pass
+    def createFrame2(self):
+        pass
