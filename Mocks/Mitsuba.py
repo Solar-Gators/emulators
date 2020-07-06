@@ -1,4 +1,24 @@
 from .Message import Message
+# address for rtr to motor
+RL1 = 0x8F89540
+RR1 = 0x8F91540
+FL1 = 0x8F99540
+FR1 = 0x8FA1540
+# address for each motor's frame 0 message
+RL1_FRAME_0 = 0x8850225
+RR1_FRAME_0 = 0x8850245
+FL1_FRAME_0 = 0x8850265
+FR1_FRAME_0 = 0x8850285
+# address for each motor's frame 1 message
+RL1_FRAME_1 = 0x8950225
+RR1_FRAME_1 = 0x8950245
+FL1_FRAME_1 = 0x8950265
+FR1_FRAME_1 = 0x8950285
+# address for each motor's frame 2 message
+RL1_FRAME_2 = 0x8A50225
+RR1_FRAME_2 = 0x8A50245
+FL1_FRAME_2 = 0x8A50265
+FR1_FRAME_2 = 0x8A50285
 
 class Mitsuba(Message):
     def __init__(self, addr_CAN, addr_telem):
@@ -27,11 +47,16 @@ class Mitsuba(Message):
         self.MotorSysErr = 3        #  8 bit
         self.FETOHLvl = 2           #  2 bit
     def createFrame0(self):
-        r = (self.advancedLeadAngle << 56) | (self.duty << 46) | (self.motorRspeed << 34) | \
-            (self.FETtemp << 29) | (self.motorCurrent << 19) | (self.battCurrentDir << 18) | \
-            (self.battCurrent << 9) | self.battVoltage
+        r = (self.advancedLeadAngle << 57) | (self.duty << 47) | (self.motorRspeed << 35) | \
+            (self.FETtemp << 30) | (self.motorCurrent << 20) | (self.battCurrentDir << 19) | \
+            (self.battCurrent << 10) | self.battVoltage
         return r
     def createFrame1(self):
-        pass
+        r = (self.drive << 38) | (self.motorStat << 36) | (self.targetVal << 26) | \
+            (self.DigiSWNum << 22) | (self.regenPos << 12) | (self.accelPos << 2) | \
+            (self.control << 1) | self.mode
+        return r
     def createFrame2(self):
-        pass
+        r = (self.FETOHLvl << 32) | (self.MotorSysErr << 24) | (self.PowSysErr << 16) | (self.ADSensorErr)
+        return r
+    def handleRTR(self, addr, msg):
