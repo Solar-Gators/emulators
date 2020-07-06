@@ -49,8 +49,10 @@ class DAD():
         self.dwf.FDwfDeviceCloseAll()
 
     def sendData(self, data):
-        
-        self.protocol.send(c_toCharArray(data), ctypes.c_int(len(data)))
+        if isinstance(self.protocol, UART):
+            self.protocol.send(c_toCharArray(data), ctypes.c_int(len(data)))
+        if isinstance(self.protocol, CAN):
+            pass
 
     def receiveData(self):
         return self.protocol.receive()
