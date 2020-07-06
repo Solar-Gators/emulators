@@ -60,3 +60,4 @@ class Mitsuba(Message):
         r = (self.FETOHLvl << 32) | (self.MotorSysErr << 24) | (self.PowSysErr << 16) | (self.ADSensorErr)
         return r
     def handleRTR(self, addr, msg):
+        pass

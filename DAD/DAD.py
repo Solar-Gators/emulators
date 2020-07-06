@@ -3,6 +3,7 @@ import math
 import sys
 import time
 from .UART import UART
+from .CAN import CAN
 
 # @name:    toCharArray_c
 # @desc:    takes the items in a class and outputs them to an array with sizes no larger
@@ -13,7 +14,7 @@ def c_toCharArray(arr):
     return (ctypes.c_char * len(arr))(*arr)
 
 class DAD():
-    def __init__(self, com_type):
+    def __init__(self, com_type, config=0):
         if sys.platform.startswith("win"):
             self.dwf = ctypes.cdll.LoadLibrary("dwf.dll")
         elif sys.platform.startswith("darwin"):
@@ -36,7 +37,7 @@ class DAD():
         if com_type == "UART":
             self.protocol = UART(self.dwf, hdwf)
         elif com_type == "CAN":
-            pass
+            self.protocol = CAN(self.dwf, hdwf, config)
         elif com_type == "SPI":
             pass
         elif com_type == "I2C":
@@ -48,6 +49,7 @@ class DAD():
         self.dwf.FDwfDeviceCloseAll()
 
     def sendData(self, data):
+        
         self.protocol.send(c_toCharArray(data), ctypes.c_int(len(data)))
 
     def receiveData(self):
