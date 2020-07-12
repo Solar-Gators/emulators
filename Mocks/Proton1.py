@@ -1,7 +1,7 @@
 import random
-from Message import Message
+from .Message import Message
 
-class Proton1Data(Message):
+class Proton1(Message):
     def __init__(self, addr_CAN, addr_telem, emmulator=None):
         super().__init__(addr_CAN, addr_telem, emmulator)
         self.vin = random.uniform(2.5, 4.3)
@@ -45,7 +45,7 @@ class Proton1Data(Message):
         return data
     def sendCAN(self):
         if self.emmulator != None:
-            self.emmulator.sendCAN(self.toFrame0,self.addr_CAN)
+            self.emmulator.sendCAN(self.toFrame0(),self.addr_CAN)
         else:
             raise NotImplementedError
 
