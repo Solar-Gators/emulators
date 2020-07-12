@@ -10,12 +10,14 @@ DEFUALT_RATE = 1e6      # 1 MHz
 class CAN(Protocol):
     def __init__(self, dwf, hdwf, config):
         # set the properties
-        self.rate = config.get('baudRate') if 'baudRate' in config else DEFUALT_RATE
+        self.rate = int(config.get('baudRate')) if 'baudRate' in config else int(DEFUALT_RATE)
         self.tx = config.get('tx') if 'tx' in config else DEFAULT_TX_PIN
         self.rx = config.get('rx') if 'rx' in config else DEFAULT_RX_PIN
         self.polarity = config.get('polarity') if 'polarity' in config else DEFAULT_POLARITY
-
+        
         print("Configuring CAN...")
+        print("BaudRate: {}\nCan High {}\nCan Low  {}\npolarity {}"\
+            .format(self.rate, self.tx, self.rx, self.polarity))
         self.dwf = dwf
         self.hdwf = hdwf
         self.cRX = ctypes.c_int(0)
@@ -34,9 +36,9 @@ class CAN(Protocol):
         time.sleep(1)
     def handleReceive(self):
         pass
-    def send(self, data, size, ID, isExtended=0, isRemote=0):
-        #                         HDWF       ID                fExtended                 fRemote                 cDLC  *rgTX
-        self.dwf.FDwfDigitalCanTx(self.hdwf, ctypes.c_int(ID), ctypes.c_int(isExtended), ctypes.c_int(isRemote), size, data)
+    def send(self, data, size, ID, isExtended, isRemote):
+        #                         HDWF       ID  fExtended   fRemote   cDLC *rgTX
+        self.dwf.FDwfDigitalCanTx(self.hdwf, ID, isExtended, isRemote, size, data)
     def receive(self): #TODO
         vStatus  = ctypes.c_int()
         vID  = ctypes.c_int()

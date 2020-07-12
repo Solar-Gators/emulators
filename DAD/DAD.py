@@ -9,9 +9,12 @@ from .CAN import CAN
 # @desc:    takes the items in a class and outputs them to an array with sizes no larger
 #           than a char in the order that is defined in X_MESSAGE_0::dataPacketToArray
 # @param:   none
-# @returns: a tuple where the first element is the c array and the second is the size
+# @returns: c char array
 def c_toCharArray(arr):
     return (ctypes.c_char * len(arr))(*arr)
+
+def c_toByteArray(arr):
+    return (ctypes.c_ubyte * len(arr))(*arr)
 
 class DAD():
     def __init__(self, com_type, config=0):
@@ -48,11 +51,22 @@ class DAD():
     def __del__(self):
         self.dwf.FDwfDeviceCloseAll()
 
-    def sendData(self, data):
+    def sendUART(self, data):
         if isinstance(self.protocol, UART):
             self.protocol.send(c_toCharArray(data), ctypes.c_int(len(data)))
-        if isinstance(self.protocol, CAN):
-            pass
+        else:
+            print("invalid")
+            return 0
+        return 1
+
+    def sendCAN(self, data, ID, isExtended=0, isRemote=0):
+
+        if len(data) > 8:
+            print("Data too large")
+            return -1
+        
+        rgbTX = c_toByteArray(data)
+        self.protocol.send(rgbTX, ctypes.c_int(len(rgbTX)), ctypes.c_int(ID), ctypes.c_int(isExtended), ctypes.c_int(isRemote))
 
     def receiveData(self):
         return self.protocol.receive()
