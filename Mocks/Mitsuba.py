@@ -21,8 +21,19 @@ FL1_FRAME_2 = 0x8A50265
 FR1_FRAME_2 = 0x8A50285
 
 class Mitsuba(Message):
-    def __init__(self, addr_CAN, addr_telem):
-        super().__init__(addr_CAN, addr_telem)
+    def __init__(self, addr_CAN, addr_telem, emmulator=None):
+        super().__init__(addr_CAN, addr_telem, emmulator)
+        # CAN adress data
+        if addr_CAN == RL1:
+            self.baseFrame = 0x8850225
+        elif addr_CAN == RR1:
+            self.baseFrame = 0x8850245
+        elif addr_CAN == FL1:
+            self.baseFrame = 0x8850265
+        elif addr_CAN == FR1:
+            self.baseFrame = 0x8850285
+        else:
+            self.baseFrame = 0x8850225
         # Frame 0 data
         self.battVoltage = 1023       # 10 bit 0.5v LSB                        0 -> 1023
         self.battCurrent = 0       #  9 bit 1A/LSB                          0 ->  511
@@ -46,23 +57,33 @@ class Mitsuba(Message):
         self.PowSysErr = 255          #  8 bit                                 0 ->   255
         self.MotorSysErr = 255        #  8 bit                                 0 ->   255
         self.FETOHLvl = 3           #  2 bit                                 0 ->     3
-    def createFrame0(self):
+    def toFrame0(self):
         r = ((self.advancedLeadAngle << 57) | (self.duty << 47) | (self.motorRspeed << 35) | \
             (self.FETtemp << 30) | (self.motorCurrent << 20) | (self.battCurrentDir << 19) | \
             (self.battCurrent << 10) | self.battVoltage)
         return r.to_bytes(8, 'little')
-    def createFrame1(self):
+    def toFrame1(self):
         r = (self.drive << 38) | (self.motorStat << 36) | (self.targetVal << 26) | \
             (self.DigiSWNum << 22) | (self.regenPos << 12) | (self.accelPos << 2) | \
             (self.control << 1) | self.mode
         return r.to_bytes(8, 'little')
-    def createFrame2(self):
+    def toFrame2(self):
         r = (self.FETOHLvl << 32) | (self.MotorSysErr << 24) | (self.PowSysErr << 16) | (self.ADSensorErr)
         return r.to_bytes(8, 'little')
-    def handleRTR(self, addr, msg):
-        pass
+    def handleRequest(self, msg):
+        if msg & 0b001:
+            self.sendCAN(self.toFrame0, self.baseFrame)
+        if msg & 0b010:
+            self.sendCAN(self.toFrame1, self.baseFrame+0x100000)
+        if msg & 0b100:
+            self.sendCAN(self.toFrame2, self.baseFrame+0x200000)
     def print(self):
         for name in self.__dict__.items():
             print(str(round(name[1], 2)))
     def toCharArray(self):
         pass
+    def sendCAN(self, data, addr):
+        if self.emmulator != None:
+            self.emmulator.sendCAN(data, addr)
+        else:
+            raise NotImplementedError

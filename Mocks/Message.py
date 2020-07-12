@@ -5,9 +5,10 @@ STARTBYTE = 0xFF
 ENDBYTE = 0x3F
 ESCCHAR = 0x2F
 class Message(ABC):
-    def __init__(self, addr_CAN, addr_telem):
+    def __init__(self, addr_CAN, addr_telem, emmulator=None):
         self.addr_CAN = addr_CAN
         self.addr_telem = addr_telem
+        self.emmulator = emmulator
         
     @abstractmethod
     def print(self):
