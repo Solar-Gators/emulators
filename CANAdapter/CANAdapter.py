@@ -1,5 +1,10 @@
 import serial
 import time
+def listToString(s):
+    r = ""
+    for ele in s:
+        r += "{0:02x}".format(ele)
+    return r
 class CANAdapter():
     def __init__(self, port, baudRate, timeStamp = False):
         self.timeStamp = timeStamp
@@ -58,11 +63,33 @@ class CANAdapter():
         ser.write(b'C\r')
         if ser.is_open:
             ser.close()
-    def send(self, addr, data)
+    def send(self, addr, data):
+        if(addr > 0x7FF and addr <= 0x1FFFFFFF):
+            self.sendExtendedFrame(addr, data)
+        elif(addr >= 0 and addr <= 0x7FF):
+            self.sendFrame(addr, data)
+        else:
+            print("Invalid address")
+            quit()
     def sendExtendedFrame(self, addr, data):
-        pass
+        temp = str('X{}{}{}\r'.format(addr,len(data),data))
+        temp = temp.encode("utf-8")
+        ser.write(temp)
+        x = str(ser.read(1))
+        x = int(x[4:-1])
+        if x != 6:
+            print("Failed to open CAN channel")
+            quit()
     def sendFrame(self, addr, data):
-        pass
+        temp = str('T{}{}{}\r'.format(str(hex(addr))[2:],len(data),listToString(data)))
+        temp = temp.encode("utf-8")
+        print(temp)
+        ser.write(temp)
+        x = str(ser.read(1))
+        x = int(x[4:-1])
+        if x != 6:
+            print("Failed to open CAN channel")
+            quit()
     def parseStandardMsg(self, msg):
         print("Message: " + msg)
         addr = int(msg[1:4], 16)
@@ -79,7 +106,7 @@ class CANAdapter():
         print("Address: {}".format(hex(addr)))
         print("Length: {}".format(hex(length)))
         print("Data: {}".format(data.hex()))
-    def readFIFO(self):
+    def receive(self):
         x = 0
         x = str(ser.read(100))
         x = x[2:-1]
@@ -96,13 +123,16 @@ class CANAdapter():
             else:
                 print("Unknown message: " + msg)
 
+
 ser = serial.Serial(port = 'COM6', timeout=1)
 
 test = CANAdapter(ser, 500e3, False)
 
 try:
     while True:
-        test.readFIFO()
+        test.receive()
+        data = [0x13, 0x24, 0x13, 0x01]
+        test.send(0x5FF,data)
         time.sleep(2)
 except KeyboardInterrupt: # wait for ctrl-c
     test.close()
