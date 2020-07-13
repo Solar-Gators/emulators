@@ -72,24 +72,32 @@ class CANAdapter():
             print("Invalid address")
             quit()
     def sendExtendedFrame(self, addr, data):
-        temp = str('X{}{}{}\r'.format(addr,len(data),data))
-        temp = temp.encode("utf-8")
-        ser.write(temp)
-        x = str(ser.read(1))
-        x = int(x[4:-1])
+        temp = str('t{}{}{}\r'.format(str(hex(addr))[2:],len(data),listToString(data)))
+        print("Sending: " + temp)
+        ser.write(temp.encode('utf-8'))
+        x = str(ser.read(2))
+        x = int(x[4:-1], 16)
         if x != 6:
-            print("Failed to open CAN channel")
+            print("Failed to send extended frame")
             quit()
     def sendFrame(self, addr, data):
-        temp = str('T{}{}{}\r'.format(str(hex(addr))[2:],len(data),listToString(data)))
-        temp = temp.encode("utf-8")
-        print(temp)
-        ser.write(temp)
-        x = str(ser.read(1))
-        x = int(x[4:-1])
-        if x != 6:
-            print("Failed to open CAN channel")
-            quit()
+        temp = str('t{}{}{}\r'.format(str(hex(addr))[2:],len(data),listToString(data)))
+        print("Sending: " + temp)
+        # print(temp.encode('hex'))
+        # ser.write(temp.encode('hex'))
+        # ser.write(b'\rT35f411223344\r')
+        y = b't3CF411223344\r'
+        print(y)
+        ser.write(y)
+        x = str(ser.read(100))
+        print(x)
+        # ser.write(b't3CF411223344\r')
+        # x = str(ser.read(100))
+        # x = int(x[4:-1], 16)
+        # print(x)
+        # if x != 6:
+        #     print("Failed to send frame")
+        #     quit()
     def parseStandardMsg(self, msg):
         print("Message: " + msg)
         addr = int(msg[1:4], 16)
@@ -131,8 +139,11 @@ test = CANAdapter(ser, 500e3, False)
 try:
     while True:
         test.receive()
-        data = [0x13, 0x24, 0x13, 0x01]
-        test.send(0x5FF,data)
+        time.sleep(0.01)
+        # data = [0x13, 0x24, 0x13, 0x01, 0x13, 0x24, 0x13, 0x01]
+        # test.send(0x5FF,data)
         time.sleep(2)
 except KeyboardInterrupt: # wait for ctrl-c
+    print("Closing...")
+finally:
     test.close()
