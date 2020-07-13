@@ -58,7 +58,7 @@ class CANAdapter():
         ser.write(b'C\r')
         if ser.is_open:
             ser.close()
-
+    def send(self, addr, data)
     def sendExtendedFrame(self, addr, data):
         pass
     def sendFrame(self, addr, data):
