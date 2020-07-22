@@ -34,8 +34,6 @@ class CAN(Protocol):
         dwf.FDwfDigitalCanRx(hdwf, None, None, None, None, None, ctypes.c_int(0), None) # initialize RX reception
 
         time.sleep(1)
-    def handleReceive(self):
-        pass
     def send(self, data, size, ID, isExtended, isRemote):
         #                         HDWF       ID  fExtended   fRemote   cDLC *rgTX
         self.dwf.FDwfDigitalCanTx(self.hdwf, ID, isExtended, isRemote, size, data)
@@ -54,10 +52,18 @@ class CAN(Protocol):
                 print("no error")
             elif vStatus.value == 2:
                 print("bit stuffing error")
+                return
             elif vStatus.value == 3:
                 print("CRC error")
+                return
             else:
                 print("error")
+                return
             if fRemote.value == 0 and cDLC.value != 0:
                 print("Data: "+(" ".join("0x{:02x}".format(c) for c in rgbRX[0:cDLC.value])))
-            return rgbRX
+            data = []
+            data.append(c for c in rgbRX[0:cDLC.value])
+            return vID.value, data
+    def print(self, ID, data):
+        print("RX: "+('0x{:08x}'.format(ID)))
+        print("Data: "+(" ".join("0x{:02x}".format(c) for c in data)))

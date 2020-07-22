@@ -21,7 +21,7 @@ class Message(ABC):
     @abstractmethod
     def toCharArray(self):
         pass
-
+    
     # @name:    toPitRFDmsg
     # @desc:    turns the data into a message as expected by the pit data collector
     #           inserts start and end byte

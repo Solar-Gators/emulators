@@ -1,5 +1,7 @@
 import serial
 import time
+# WIP
+# VALUES ARE HARDCODED
 def listToString(s):
     r = ""
     for ele in s:
@@ -45,7 +47,7 @@ class CANAdapter():
             print("Failed to configure timestamp")
             quit()
     def setBaudRate(self):
-        ser.write(b'S6\r')
+        ser.write(b'S0\r')
         x = str(ser.read(1))
         x = int(x[4:-1])
         if x != 6:
@@ -82,14 +84,10 @@ class CANAdapter():
             quit()
     def sendFrame(self, addr, data):
         temp = str('t{}{}{}\r'.format(str(hex(addr))[2:],len(data),listToString(data)))
-        print("Sending: " + temp)
-        # print(temp.encode('hex'))
-        # ser.write(temp.encode('hex'))
-        # ser.write(b'\rT35f411223344\r')
         y = b't3CF411223344\r'
-        print(y)
+        print("Sending: " + str(y))
         ser.write(y)
-        x = str(ser.read(100))
+        x = str(ser.read(1))
         print(x)
         # ser.write(b't3CF411223344\r')
         # x = str(ser.read(100))
@@ -140,8 +138,8 @@ try:
     while True:
         test.receive()
         time.sleep(0.01)
-        # data = [0x13, 0x24, 0x13, 0x01, 0x13, 0x24, 0x13, 0x01]
-        # test.send(0x5FF,data)
+        data = [0x13, 0x24, 0x13, 0x01, 0x13, 0x24, 0x13, 0x01]
+        test.send(0x5FF,data)
         time.sleep(2)
 except KeyboardInterrupt: # wait for ctrl-c
     print("Closing...")

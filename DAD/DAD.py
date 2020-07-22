@@ -68,5 +68,8 @@ class DAD():
         rgbTX = c_toByteArray(data)
         self.protocol.send(rgbTX, ctypes.c_int(len(rgbTX)), ctypes.c_int(ID), ctypes.c_int(isExtended), ctypes.c_int(isRemote))
 
-    def receiveData(self):
-        return self.protocol.receive()
+    def receiveCAN(self, cb):
+        # call back should be a dictionary of CAN addrs with a parsing function
+        ID, data = self.protocol.receive()
+        cb[ID](data) if ID in cb else self.protocol.print(ID, data)
+        

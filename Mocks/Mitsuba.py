@@ -70,13 +70,6 @@ class Mitsuba(Message):
     def toFrame2(self):
         r = (self.FETOHLvl << 32) | (self.MotorSysErr << 24) | (self.PowSysErr << 16) | (self.ADSensorErr)
         return r.to_bytes(8, 'little')
-    def handleRequest(self, msg):
-        if msg & 0b001:
-            self.sendCAN(self.toFrame0, self.baseFrame)
-        if msg & 0b010:
-            self.sendCAN(self.toFrame1, self.baseFrame+0x100000)
-        if msg & 0b100:
-            self.sendCAN(self.toFrame2, self.baseFrame+0x200000)
     def print(self):
         for name in self.__dict__.items():
             print(str(round(name[1], 2)))
@@ -87,3 +80,12 @@ class Mitsuba(Message):
             self.emmulator.sendCAN(data, addr)
         else:
             raise NotImplementedError
+    def receiveCAN(self, data):
+        # This will normally be an rtr (I don't know when it would be something else.)
+        if msg & 0b001:
+            self.sendCAN(self.toFrame0, self.baseFrame)
+        if msg & 0b010:
+            self.sendCAN(self.toFrame1, self.baseFrame+0x100000)
+        if msg & 0b100:
+            self.sendCAN(self.toFrame2, self.baseFrame+0x200000)
+        
