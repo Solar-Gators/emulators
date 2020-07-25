@@ -48,8 +48,8 @@ class Proton1(Message):
             self.emmulator.sendCAN(self.toFrame0(),self.addr_CAN)
         else:
             raise NotImplementedError
-    def receiveCAN(self):
-        pass
+    def receiveCAN(self, data):
+        print("Mppt Data: {}".format(data))
 
 if __name__ == "__main__":
     mppt = Proton1Data(0x034, 0x01)

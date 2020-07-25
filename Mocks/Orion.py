@@ -22,8 +22,8 @@ class Orion(Message):
             r.append(temp & 0xFF)
             r.append((temp >> 8) & 0xFF)
         return r
-    def receiveCAN(self):
-        pass
+    def receiveCAN(self, data):
+        print("Orion data: {}".format(data))
 
 if __name__ == "__main__":
     data = Orion(0xff, 0x02)

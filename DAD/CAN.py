@@ -48,22 +48,31 @@ class CAN(Protocol):
         self.dwf.FDwfDigitalCanRx(self.hdwf, ctypes.byref(vID), ctypes.byref(fExtended), ctypes.byref(fRemote), ctypes.byref(cDLC), rgbRX, ctypes.c_int(ctypes.sizeof(rgbRX)), ctypes.byref(vStatus)) 
         if vStatus.value != 0:
             print("RX: "+('0x{:08x}'.format(vID.value)) +" "+("Extended " if fExtended.value!=0 else "")+("Remote " if fRemote.value!=0 else "")+"DLC: "+str(cDLC.value))
-            if vStatus.value == 1:
-                print("no error")
-            elif vStatus.value == 2:
-                print("bit stuffing error")
+
+            if self.checkError(vStatus.value):
                 return
-            elif vStatus.value == 3:
-                print("CRC error")
-                return
-            else:
-                print("error")
-                return
-            if fRemote.value == 0 and cDLC.value != 0:
-                print("Data: "+(" ".join("0x{:02x}".format(c) for c in rgbRX[0:cDLC.value])))
+
             data = []
-            data.append(c for c in rgbRX[0:cDLC.value])
+            # convert the data into a python list
+            for c in rgbRX[0:cDLC.value]:
+                data.append(c)
             return vID.value, data
+        return -1, -1
+
     def print(self, ID, data):
-        print("RX: "+('0x{:08x}'.format(ID)))
+        print("Address: "+('0x{:08x}'.format(ID)))
         print("Data: "+(" ".join("0x{:02x}".format(c) for c in data)))
+
+    def checkError(self, status):
+        if status == 1:
+            print("no error")
+        elif status.value == 2:
+            print("bit stuffing error")
+            return True
+        elif status == 3:
+            print("CRC error")
+            return True
+        else:
+            print("error")
+            return True
+        return False

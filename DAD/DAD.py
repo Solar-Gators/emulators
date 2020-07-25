@@ -25,22 +25,42 @@ class DAD():
         else:
             self.dwf = ctypes.cdll.LoadLibrary("libdwf.so")
 
-        hdwf = ctypes.c_int()
+        self.hdwf = ctypes.c_int()
+        
 
         print("Opening first device")
-        #dwf.FDwfDeviceOpen(c_int(-1), byref(hdwf))
+        #dwf.FDwfDeviceOpen(c_int(-1), byref(self.hdwf))
         # device configuration of index 3 (4th) for Analog Discovery has 16kS digital-in/out buffer
-        self.dwf.FDwfDeviceConfigOpen(ctypes.c_int(-1), ctypes.c_int(3), ctypes.byref(hdwf))
-        if hdwf.value == 0:
+        self.dwf.FDwfDeviceConfigOpen(ctypes.c_int(-1), ctypes.c_int(3), ctypes.byref(self.hdwf))
+        if self.hdwf.value == 0:
             print("failed to open device")
             szerr = ctypes.create_string_buffer(512)
             self.dwf.FDwfGetLastErrorMsg(szerr)
             print(str(szerr.value))
             quit()
+        supplyVoltage = ctypes.c_double()
+        # set up analog IO channel nodes
+        # enable positive supply
+        self.dwf.FDwfAnalogIOChannelNodeSet(self.hdwf, ctypes.c_int(0), ctypes.c_int(0), ctypes.c_double(True)) 
+        # set voltage to 5 V
+        self.dwf.FDwfAnalogIOChannelNodeSet(self.hdwf, ctypes.c_int(0), ctypes.c_int(1), ctypes.c_double(5.0)) 
+        
+        # master enable
+        self.dwf.FDwfAnalogIOEnableSet(self.hdwf, ctypes.c_int(True))
+        IsEnabled = ctypes.c_bool()
+        self.dwf.FDwfAnalogIOEnableStatus(self.hdwf, ctypes.byref(IsEnabled))
+        if(IsEnabled.value):
+            print("Power supplies on.")
+        else:
+            print("Power supplies off.")
+
+        time.sleep(0.1)
+        print("Supply voltage: " + str(self.getSupplyVoltage()) + "V")
+        
         if com_type == "UART":
-            self.protocol = UART(self.dwf, hdwf)
+            self.protocol = UART(self.dwf, self.hdwf)
         elif com_type == "CAN":
-            self.protocol = CAN(self.dwf, hdwf, config)
+            self.protocol = CAN(self.dwf, self.hdwf, config)
         elif com_type == "SPI":
             pass
         elif com_type == "I2C":
@@ -48,6 +68,7 @@ class DAD():
         else:
             print("invalid comunication protocol.")
             quit()
+        
     def __del__(self):
         self.dwf.FDwfDeviceCloseAll()
 
@@ -71,5 +92,43 @@ class DAD():
     def receiveCAN(self, cb):
         # call back should be a dictionary of CAN addrs with a parsing function
         ID, data = self.protocol.receive()
-        cb[ID](data) if ID in cb else self.protocol.print(ID, data)
+        if ID != -1:
+            if ID in cb:
+                cb[ID](data)
+            else:
+                self.protocol.print(ID, data)
+    def setPowerSupply_p(self, val):
+        if val < 0:
+            # enable positive supply
+            self.dwf.FDwfAnalogIOChannelNodeSet(self.hdwf, ctypes.c_int(0), ctypes.c_int(0), ctypes.c_double(True)) 
+            # set voltage to 5 V
+            self.dwf.FDwfAnalogIOChannelNodeSet(self.hdwf, ctypes.c_int(0), ctypes.c_int(1), ctypes.c_double(5.0))
         
+            self.dwf.FDwfAnalogIOEnableSet(self.hdwf, ctypes.c_int(True))
+        
+
+        
+    def setPowerSupply_n(self, val):
+        if val > 0:
+            return False
+        return False
+
+    def isPowerSupplyOn(self):
+        IsEnabled = ctypes.c_bool()
+        self.dwf.FDwfAnalogIOEnableStatus(self.hdwf, ctypes.byref(IsEnabled))
+        if(IsEnabled):
+            "Power supplies on."
+        return IsEnabled
+
+    # val is a bool
+    def setAnalogIOStatus(self, val):
+        # self.dwf.FDwfAnalogIOEnableSet(self.hdwf, ctypes.c_int(False)) 
+        # self.dwf.FDwfAnalogIOEnableSet(self.hdwf, ctypes.c_int(True))
+        self.dwf.FDwfAnalogIOEnableSet(self.hdwf, ctypes.c_int(val))
+    
+    def getSupplyVoltage(self):
+        supplyVoltage = ctypes.c_double()
+        time.sleep(0.1)
+        self.dwf.FDwfAnalogIOChannelNodeStatus(self.hdwf, ctypes.c_int(2), ctypes.c_int(0), ctypes.byref(supplyVoltage))
+        
+        return supplyVoltage.value

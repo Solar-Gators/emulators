@@ -40,7 +40,7 @@ class Mitsuba(Message):
         self.battCurrentDir = 10    #  1 bit '0' (+) / '1' (-)               0 ->    1
         self.motorCurrent = 10      # 10 bit 1A/LSB                          0 -> 1023
         self.FETtemp = 9            #  5 bit 5C/LSB                          0 ->   31
-        self.motorRspeed = 8        # 12 bit 1rpm/LSB                        0 -> 4095
+        self.motorRspeed = 3000       # 12 bit 1rpm/LSB                        0 -> 4095
         self.duty = 1023              # 10 bit 0.5%/LSB                        0 -> 1023
         self.advancedLeadAngle = 0 #  7 bit 0.5Deg_e/LSB                    0 ->  127
         # Frame 1 data
@@ -66,10 +66,10 @@ class Mitsuba(Message):
         r = (self.drive << 38) | (self.motorStat << 36) | (self.targetVal << 26) | \
             (self.DigiSWNum << 22) | (self.regenPos << 12) | (self.accelPos << 2) | \
             (self.control << 1) | self.mode
-        return r.to_bytes(8, 'little')
+        return r.to_bytes(5, 'little')
     def toFrame2(self):
         r = (self.FETOHLvl << 32) | (self.MotorSysErr << 24) | (self.PowSysErr << 16) | (self.ADSensorErr)
-        return r.to_bytes(8, 'little')
+        return r.to_bytes(5, 'little')
     def print(self):
         for name in self.__dict__.items():
             print(str(round(name[1], 2)))
@@ -77,15 +77,16 @@ class Mitsuba(Message):
         pass
     def sendCAN(self, data, addr):
         if self.emmulator != None:
-            self.emmulator.sendCAN(data, addr)
+            self.emmulator.sendCAN(data, addr, True, False)
         else:
             raise NotImplementedError
     def receiveCAN(self, data):
-        # This will normally be an rtr (I don't know when it would be something else.)
-        if msg & 0b001:
-            self.sendCAN(self.toFrame0, self.baseFrame)
-        if msg & 0b010:
-            self.sendCAN(self.toFrame1, self.baseFrame+0x100000)
-        if msg & 0b100:
-            self.sendCAN(self.toFrame2, self.baseFrame+0x200000)
+        print("Mitsuba Data: "+(" ".join("0x{:02x}".format(c) for c in data)))
+        # This will normally be an CAN message to send data
+        if data[0] & 0b001:
+            self.sendCAN(self.toFrame0(), self.baseFrame)
+        if data[0] & 0b010:
+            self.sendCAN(self.toFrame1(), self.baseFrame+0x100000)
+        if data[0] & 0b100:
+            self.sendCAN(self.toFrame2(), self.baseFrame+0x200000)
         
