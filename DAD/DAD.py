@@ -44,18 +44,21 @@ class DAD():
         self.dwf.FDwfAnalogIOChannelNodeSet(self.hdwf, ctypes.c_int(0), ctypes.c_int(0), ctypes.c_double(True)) 
         # set voltage to 5 V
         self.dwf.FDwfAnalogIOChannelNodeSet(self.hdwf, ctypes.c_int(0), ctypes.c_int(1), ctypes.c_double(5.0)) 
-        
+        time.sleep(1)
         # master enable
         self.dwf.FDwfAnalogIOEnableSet(self.hdwf, ctypes.c_int(True))
+        self.setPowerSupply_p(5.0)
+        time.sleep(1)
         IsEnabled = ctypes.c_bool()
         self.dwf.FDwfAnalogIOEnableStatus(self.hdwf, ctypes.byref(IsEnabled))
-        if(IsEnabled.value):
+        time.sleep(5)
+        if(IsEnabled):
             print("Power supplies on.")
         else:
             print("Power supplies off.")
-
-        time.sleep(0.1)
-        print("Supply voltage: " + str(self.getSupplyVoltage()) + "V")
+        self.dwf.FDwfAnalogIOChannelNodeStatus(self.hdwf, ctypes.c_int(2), ctypes.c_int(0), ctypes.byref(supplyVoltage))
+        time.sleep(5)
+        print("Supply voltage {}".format(supplyVoltage.value))
         
         if com_type == "UART":
             self.protocol = UART(self.dwf, self.hdwf)
@@ -102,7 +105,7 @@ class DAD():
             # enable positive supply
             self.dwf.FDwfAnalogIOChannelNodeSet(self.hdwf, ctypes.c_int(0), ctypes.c_int(0), ctypes.c_double(True)) 
             # set voltage to 5 V
-            self.dwf.FDwfAnalogIOChannelNodeSet(self.hdwf, ctypes.c_int(0), ctypes.c_int(1), ctypes.c_double(5.0))
+            self.dwf.FDwfAnalogIOChannelNodeSet(self.hdwf, ctypes.c_int(0), ctypes.c_int(1), ctypes.c_double(float(5.0)))
         
             self.dwf.FDwfAnalogIOEnableSet(self.hdwf, ctypes.c_int(True))
         
