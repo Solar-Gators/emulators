@@ -17,7 +17,14 @@ def c_toByteArray(arr):
     return (ctypes.c_ubyte * len(arr))(*arr)
 
 class DAD():
-    def __init__(self, com_type, config=0):
+    
+    def __init__(self):
+        # Available Protocols
+        self.__CAN = []
+        self.__UART = []
+        self.__I2C = []
+        self.__SPI = []
+
         if sys.platform.startswith("win"):
             self.dwf = ctypes.cdll.LoadLibrary("dwf.dll")
         elif sys.platform.startswith("darwin"):
@@ -38,6 +45,16 @@ class DAD():
             self.dwf.FDwfGetLastErrorMsg(szerr)
             print(str(szerr.value))
             quit()
+
+    def CAN_init(self, config = None):
+        self.__CAN.append(CAN(self.dwf, self.hdwf, config))
+        return 0
+
+    def UART_init(self, config = None):
+        self.__UART.append(UART(self.dwf, self.hdwf))
+        return 0
+        
+    def posSupply_init(self, config= None):
         supplyVoltage = ctypes.c_double()
         # set up analog IO channel nodes
         # enable positive supply
@@ -46,6 +63,7 @@ class DAD():
         self.dwf.FDwfAnalogIOChannelNodeSet(self.hdwf, ctypes.c_int(0), ctypes.c_int(1), ctypes.c_double(5.0))
         # master enable
         self.dwf.FDwfAnalogIOEnableSet(self.hdwf, ctypes.c_int(True))
+        self.dwf.FDwfAnalogIOChannelNodeStatus(self.hdwf, ctypes.c_int(2), ctypes.c_int(0), ctypes.byref(supplyVoltage))
         # self.setPowerSupply_p(5.0)
         IsEnabled = ctypes.c_bool()
         self.dwf.FDwfAnalogIOEnableStatus(self.hdwf, ctypes.byref(IsEnabled))
@@ -53,50 +71,31 @@ class DAD():
             print("Power supplies on.")
         else:
             print("Power supplies off.")
-        self.dwf.FDwfAnalogIOChannelNodeStatus(self.hdwf, ctypes.c_int(2), ctypes.c_int(0), ctypes.byref(supplyVoltage))
-        
         print("Supply voltage {}".format(supplyVoltage.value))
-        
-        if com_type == "UART":
-            self.protocol = UART(self.dwf, self.hdwf)
-        elif com_type == "CAN":
-            self.protocol = CAN(self.dwf, self.hdwf, config)
-        elif com_type == "SPI":
-            pass
-        elif com_type == "I2C":
-            pass
-        else:
-            print("invalid comunication protocol.")
-            quit()
         
     def __del__(self):
         self.dwf.FDwfDeviceCloseAll()
 
-    def sendUART(self, data):
-        if isinstance(self.protocol, UART):
-            self.protocol.send(c_toCharArray(data), ctypes.c_int(len(data)))
-        else:
-            print("invalid")
-            return 0
-        return 1
+    def sendUART(self, data, channel = 0):
+        self.__UART[channel].send(data)
 
-    def sendCAN(self, data, ID, isExtended=0, isRemote=0):
+    def sendCAN(self, data, ID, isExtended=0, isRemote=0, channel = 0):
 
         if len(data) > 8:
             print("Data too large")
             return -1
         
         rgbTX = c_toByteArray(data)
-        self.protocol.send(rgbTX, ctypes.c_int(len(rgbTX)), ctypes.c_int(ID), ctypes.c_int(isExtended), ctypes.c_int(isRemote))
+        self.__CAN[channel].send(rgbTX, ctypes.c_int(len(rgbTX)), ctypes.c_int(ID), ctypes.c_int(isExtended), ctypes.c_int(isRemote))
 
-    def receiveCAN(self, cb):
+    def receiveCAN(self, cb, channel = 0):
         # call back should be a dictionary of CAN addrs with a parsing function
-        ID, data = self.protocol.receive()
+        ID, data = self.__CAN[channel].protocol.receive()
         if ID != -1:
             if ID in cb:
                 cb[ID](data)
             else:
-                self.protocol.print(ID, data)
+                self.__CAN[channel].protocol.print(ID, data)
                 
     def setPowerSupply_p(self, val):
         if val < 0:
