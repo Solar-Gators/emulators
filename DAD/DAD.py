@@ -53,7 +53,7 @@ class DAD():
     def UART_init(self, config = None):
         self.__UART.append(UART(self.dwf, self.hdwf))
         return 0
-        
+
     def posSupply_init(self, config= None):
         supplyVoltage = ctypes.c_double()
         # set up analog IO channel nodes
@@ -90,12 +90,12 @@ class DAD():
 
     def receiveCAN(self, cb, channel = 0):
         # call back should be a dictionary of CAN addrs with a parsing function
-        ID, data = self.__CAN[channel].protocol.receive()
+        ID, data = self.__CAN[channel].receive()
         if ID != -1:
             if ID in cb:
                 cb[ID](data)
             else:
-                self.__CAN[channel].protocol.print(ID, data)
+                CAN.print(ID, data)
                 
     def setPowerSupply_p(self, val):
         if val < 0:

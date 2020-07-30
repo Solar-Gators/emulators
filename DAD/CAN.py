@@ -49,7 +49,7 @@ class CAN(Protocol):
         if vStatus.value != 0:
             print("RX: "+('0x{:08x}'.format(vID.value)) +" "+("Extended " if fExtended.value!=0 else "")+("Remote " if fRemote.value!=0 else "")+"DLC: "+str(cDLC.value))
 
-            if self.checkError(vStatus.value):
+            if self._checkError(vStatus.value):
                 return
 
             data = []
@@ -58,12 +58,12 @@ class CAN(Protocol):
                 data.append(c)
             return vID.value, data
         return -1, -1
-
-    def print(self, ID, data):
+    @staticmethod
+    def print(ID, data):
         print("Address: "+('0x{:08x}'.format(ID)))
         print("Data: "+(" ".join("0x{:02x}".format(c) for c in data)))
-
-    def checkError(self, status):
+    @staticmethod
+    def _checkError(status):
         if status == 1:
             print("no error")
         elif status.value == 2:
