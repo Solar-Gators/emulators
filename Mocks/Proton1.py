@@ -4,10 +4,10 @@ from .Message import Message
 class Proton1(Message):
     def __init__(self, addr_CAN, addr_telem, emmulator=None):
         super().__init__(addr_CAN, addr_telem, emmulator)
-        self.vin = random.uniform(2.5, 4.3)
-        self.vout = random.uniform(2.5, 4.3)
-        self.iin = random.uniform(2.5, 4.3)
-        self.temp = random.uniform(30, 40)
+        self.vin = 37.4
+        self.vout = 85.2
+        self.iin = 2.3
+        self.temp = 37.12
     def print(self):
         for name in self.__dict__.items():
             print(str(round(name[1], 2)))
