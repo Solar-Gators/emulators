@@ -52,6 +52,6 @@ class Proton1(Message):
         self.sendCAN()
 
 if __name__ == "__main__":
-    mppt = Proton1Data(0x034, 0x01)
+    mppt = Proton1(0x034, 0x01)
     data = mppt.toFrame0()
     print(data)
