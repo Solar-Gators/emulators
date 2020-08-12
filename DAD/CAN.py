@@ -1,29 +1,28 @@
 from .Protocol import Protocol
 import ctypes
 import time
-# defaults
-DEFAULT_TX_PIN = 0      # DIO-0
-DEFAULT_RX_PIN = 1      # DIO-1
-DEFAULT_POLARITY = 0    # normal
-DEFUALT_RATE = 1e6      # 1 MHz
 
 class CAN(Protocol):
-    def __init__(self, dwf, hdwf, config):
+    def __init__(self, dwf, hdwf, tx=0, rx=1, polarity=0, baudRate=1e6):
+        """
+        This is the constructor for the CAN protocol
+        it configures the tx and rx pins and sets the polatiry and baudRate.
+        """
         # set the properties
-        self.rate = int(config.get('baudRate')) if 'baudRate' in config else int(DEFUALT_RATE)
-        self.tx = config.get('tx') if 'tx' in config else DEFAULT_TX_PIN
-        self.rx = config.get('rx') if 'rx' in config else DEFAULT_RX_PIN
-        self.polarity = config.get('polarity') if 'polarity' in config else DEFAULT_POLARITY
+        self.baudRate = baudRate
+        self.tx = tx
+        self.rx = rx
+        self.polarity = polarity
         
         print("Configuring CAN...")
         print("BaudRate: {}\nCan High {}\nCan Low  {}\npolarity {}"\
-            .format(self.rate, self.tx, self.rx, self.polarity))
+            .format(self.baudRate, self.tx, self.rx, self.polarity))
         self.dwf = dwf
         self.hdwf = hdwf
         self.cRX = ctypes.c_int(0)
         self.fParity = ctypes.c_int(0)
 
-        dwf.FDwfDigitalCanRateSet(hdwf, ctypes.c_double(self.rate))
+        dwf.FDwfDigitalCanRateSet(hdwf, ctypes.c_double(self.baudRate))
         dwf.FDwfDigitalCanPolaritySet(hdwf, ctypes.c_int(self.polarity))
         dwf.FDwfDigitalCanTxSet(hdwf, ctypes.c_int(self.tx))
         dwf.FDwfDigitalCanRxSet(hdwf, ctypes.c_int(self.rx))
@@ -35,9 +34,16 @@ class CAN(Protocol):
 
         time.sleep(0.1)
     def send(self, data, size, ID, isExtended, isRemote):
+        """
+        This sends the given data on the TX line.
+        """
         #                         HDWF       ID  fExtended   fRemote   cDLC *rgTX
         self.dwf.FDwfDigitalCanTx(self.hdwf, ID, isExtended, isRemote, size, data)
-    def receive(self): #TODO
+    def receive(self):
+        """
+        This returns any data that the DAD has in the CAN FIFO in a tuple ID, data.
+        If there is an error it displays the error and returns -1, -1.
+        """
         vStatus  = ctypes.c_int()
         vID  = ctypes.c_int()
         fExtended  = ctypes.c_int()
@@ -60,10 +66,16 @@ class CAN(Protocol):
         return -1, -1
     @staticmethod
     def print(ID, data):
+        """
+        This prints a CAN message given the ID and the data in a list.
+        """
         print("Address: "+('0x{:08x}'.format(ID)))
         print("Data: "+(" ".join("0x{:02x}".format(c) for c in data)))
     @staticmethod
     def _checkError(status):
+        """
+        This checks to see if there was an error when receiving a new CAN message.
+        """
         if status == 1:
             print("no error")
         elif status.value == 2:

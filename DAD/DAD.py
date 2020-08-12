@@ -19,11 +19,14 @@ def c_toByteArray(arr):
 class DAD():
     
     def __init__(self):
+        """
+        This opens the DAD board and dlls needed to interface with it. It then opens the device and stores the HWDF.
+        """
         # Available Protocols
-        self.__CAN = []
-        self.__UART = []
-        self.__I2C = []
-        self.__SPI = []
+        self.__CAN = None
+        self.__UART = None
+        self.__I2C = None
+        self.__SPI = None
 
         if sys.platform.startswith("win"):
             self.dwf = ctypes.cdll.LoadLibrary("dwf.dll")
@@ -36,9 +39,12 @@ class DAD():
         
 
         print("Opening first device")
-        #dwf.FDwfDeviceOpen(c_int(-1), byref(self.hdwf))
-        # device configuration of index 3 (4th) for Analog Discovery has 16kS digital-in/out buffer
+        
+        # TODO: Add the ability to open a specific device should there be multiple connected.
+        # Open the first device
         self.dwf.FDwfDeviceConfigOpen(ctypes.c_int(-1), ctypes.c_int(3), ctypes.byref(self.hdwf))
+
+        # Check to see if the device was opened
         if self.hdwf.value == 0:
             print("failed to open device")
             szerr = ctypes.create_string_buffer(512)
@@ -46,15 +52,24 @@ class DAD():
             print(str(szerr.value))
             quit()
 
-    def CAN_init(self, config = None):
-        self.__CAN.append(CAN(self.dwf, self.hdwf, config))
+    def CAN_init(self, txPin=0, rxPin=1, polarity=0, baudRate=1e6):
+        """
+        This initailizes a CAN interface to the given pins at the polarity and baudrate specified.
+        """
+        self.__CAN = CAN(self.dwf, self.hdwf, txPin, rxPin, polarity, baudRate)
         return 0
 
-    def UART_init(self, config = None):
-        self.__UART.append(UART(self.dwf, self.hdwf))
+    def UART_init(self, txPin=0, rxPin=1, length=8, parity=0, stop=1, baudRate=1e6):
+        """
+        This initailizes a UART interface to the given pins with the given length, parity, stop length and baudrate specified.
+        """
+        self.__UART = UART(self.dwf, self.hdwf, txPin, rxPin, length, parity, stop, baudRate)
         return 0
 
     def posSupply_init(self, config= None):
+        """
+        Initializes the positive power suppy to 5 volts.
+        """
         supplyVoltage = ctypes.c_double()
         # set up analog IO channel nodes
         # enable positive supply
@@ -74,23 +89,35 @@ class DAD():
         print("Supply voltage {}".format(supplyVoltage.value))
         
     def __del__(self):
+        """
+        Ensures the device is properly closed when the class falls out of scope.
+        """
         self.dwf.FDwfDeviceCloseAll()
 
-    def sendUART(self, data, channel = 0):
-        self.__UART[channel].send(data)
+    def sendUART(self, data):
+        """
+        Sends the given data.
+        """
+        self.__UART.send(data)
 
     def sendCAN(self, data, ID, isExtended=0, isRemote=0, channel = 0):
-
+        """
+        Sends the given data given the parameters.
+        """
         if len(data) > 8:
             print("Data too large")
             return -1
         
         rgbTX = c_toByteArray(data)
-        self.__CAN[channel].send(rgbTX, ctypes.c_int(len(rgbTX)), ctypes.c_int(ID), ctypes.c_int(isExtended), ctypes.c_int(isRemote))
+        self.__CAN.send(rgbTX, ctypes.c_int(len(rgbTX)), ctypes.c_int(ID), ctypes.c_int(isExtended), ctypes.c_int(isRemote))
 
     def receiveCAN(self, cb, channel = 0):
+        """
+        Uses a callback to decode the messages and take appropriet action. If no callback exists for a given address then it prints the message.
+        The callback should be a python dictionary with the key being unique CAN adresses and the data being the function to be preformed on the incomming data.
+        """
         # call back should be a dictionary of CAN addrs with a parsing function
-        ID, data = self.__CAN[channel].receive()
+        ID, data = self.__CAN.receive()
         if ID != -1:
             if ID in cb:
                 cb[ID](data)
