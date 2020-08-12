@@ -36,8 +36,8 @@ class Mitsuba(Message):
             self.baseFrame = 0x8850225
         # Frame 0 data
         self.battVoltage = 1023       # 10 bit 0.5v LSB                        0 -> 1023
-        self.battCurrent = 0       #  9 bit 1A/LSB                          0 ->  511
-        self.battCurrentDir = 10    #  1 bit '0' (+) / '1' (-)               0 ->    1
+        self.battCurrent = 2       #  9 bit 1A/LSB                          0 ->  511
+        self.battCurrentDir = 0    #  1 bit '0' (+) / '1' (-)               0 ->    1
         self.motorCurrent = 10      # 10 bit 1A/LSB                          0 -> 1023
         self.FETtemp = 9            #  5 bit 5C/LSB                          0 ->   31
         self.motorRspeed = 3000       # 12 bit 1rpm/LSB                        0 -> 4095
@@ -53,9 +53,24 @@ class Mitsuba(Message):
         self.motorStat = 2          #  2 bit Wait/Forward/Reverse            0 ->    3
         self.drive = 1              #  1 bit '0' (Drive) / '1' (Regen)       0 ->    1
         # Frame 2 data
-        self.ADSensorErr = 65535       # 16 bit                                 0 -> 65535
-        self.PowSysErr = 255          #  8 bit                                 0 ->   255
-        self.MotorSysErr = 255        #  8 bit                                 0 ->   255
+        self.adSensorError = 1
+        self.motorCurrSensorUError = 0
+        self.motorCurrSensorWError = 1
+        self.fetThermError = 0
+        self.battVoltSensorError = 1
+        self.battCurrSensorError = 0
+        self.battCurrSensorAdjError = 1
+        self.motorCurrSensorAdjError = 0
+        self.accelPosError = 1
+        self.contVoltSensorError = 0
+        self.powerSystemError = 1
+        self.overCurrError = 0
+        self.overVoltError = 1
+        self.overCurrLimit = 0
+        self.motorSystemError = 1
+        self.motorLock = 0
+        self.hallSensorShort = 1
+        self.hallSensorOpen = 0
         self.FETOHLvl = 3           #  2 bit                                 0 ->     3
     def toFrame0(self):
         r = ((self.advancedLeadAngle << 57) | (self.duty << 47) | (self.motorRspeed << 35) | \
@@ -68,7 +83,10 @@ class Mitsuba(Message):
             (self.control << 1) | self.mode
         return r.to_bytes(5, 'little')
     def toFrame2(self):
-        r = (self.FETOHLvl << 32) | (self.MotorSysErr << 24) | (self.PowSysErr << 16) | (self.ADSensorErr)
+        r = (self.FETOHLvl << 32) | (self.hallSensorOpen << 27) | (self.hallSensorShort << 26) | (self.motorLock << 25) | (self.motorSystemError << 24) | (self.overCurrLimit << 21) | \
+            (self.overVoltError << 19) | (self.overCurrError << 17) |  (self.powerSystemError << 16) | (self.contVoltSensorError << 11) | (self.accelPosError << 9) | \
+            (self.motorCurrSensorAdjError << 8) | (self.battCurrSensorAdjError << 7) | (self.battCurrSensorError << 6) | (self.battVoltSensorError << 5) | \
+            (self.fetThermError << 3) | (self.motorCurrSensorWError << 2) | (self.motorCurrSensorUError << 1) | self.adSensorError
         return r.to_bytes(5, 'little')
     def print(self):
         for name in self.__dict__.items():
