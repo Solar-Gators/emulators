@@ -49,7 +49,7 @@ class Proton1(Message):
         else:
             raise NotImplementedError
     def receiveCAN(self, data):
-        print("Mppt Data: {}".format(data))
+        self.sendCAN()
 
 if __name__ == "__main__":
     mppt = Proton1Data(0x034, 0x01)
