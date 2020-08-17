@@ -7,7 +7,7 @@ class Proton1(Message):
         self.vin = 37.4
         self.vout = 85.2
         self.iin = 2.3
-        self.temp = 37.12
+        self.temperature = 37.12
     def print(self):
         for name in self.__dict__.items():
             print(str(round(name[1], 2)))
@@ -33,12 +33,12 @@ class Proton1(Message):
         temp = temp / 0x100
         data.append(int(temp) & 0xFF)
         # handle iin
-        temp = int(self.vout * 1000)
+        temp = int(self.iin * 100)
         data.append(int(temp) & 0xFF)
         temp = temp / 0x100
         data.append(int(temp) & 0xFF)
         # handle temp
-        temp = int(self.vout * 100)
+        temp = int(self.temperature * 100)
         data.append(int(temp) & 0xFF)
         temp = temp / 0x100
         data.append(int(temp) & 0xFF)

@@ -14,13 +14,13 @@ emmulator.CAN_init(baudRate=500e3)
 emmulator.posSupply_init()
 mc = Mitsuba(0x08F89540, 0x01, emmulator)
 mppt = Proton1(1024, 0x2, emmulator)
-bms = Orion(0x6B0, 0x1)
+# bms = Orion(0x6B0, 0x1, emmulator)
 
-bmsThread = threading.Timer(0.1, bms.sendCAN)
-bmsThread.daemon = True
-bmsThread.start()
+# bmsThread = threading.Timer(0.1, bms.sendCAN)
+# bmsThread.daemon = True
+# bmsThread.start()
 
-cb = {mc.addr_CAN: mc.receiveCAN, mppt.addr_CAN: mppt.receiveCAN, bms.addr_CAN: bms.receiveCAN}
+cb = {mc.addr_CAN: mc.receiveCAN, mppt.addr_CAN: mppt.receiveCAN}
 try:
     while True:
         emmulator.receiveCAN(cb)
