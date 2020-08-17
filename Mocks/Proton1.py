@@ -2,8 +2,8 @@ import random
 from .Message import Message
 
 class Proton1(Message):
-    def __init__(self, addr_CAN, addr_telem, emmulator=None):
-        super().__init__(addr_CAN, addr_telem, emmulator)
+    def __init__(self, addr_CAN, addr_telem, emulator=None):
+        super().__init__(addr_CAN, addr_telem, emulator)
         self.vin = 37.4
         self.vout = 85.2
         self.iin = 2.3
@@ -44,8 +44,8 @@ class Proton1(Message):
         data.append(int(temp) & 0xFF)
         return data
     def sendCAN(self):
-        if self.emmulator != None:
-            self.emmulator.sendCAN(self.toFrame0(),self.addr_CAN)
+        if self.emulator != None:
+            self.emulator.sendCAN(self.toFrame0(),self.addr_CAN)
         else:
             raise NotImplementedError
     def receiveCAN(self, data):

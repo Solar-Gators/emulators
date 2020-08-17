@@ -21,8 +21,8 @@ FL1_FRAME_2 = 0x8A50265
 FR1_FRAME_2 = 0x8A50285
 
 class Mitsuba(Message):
-    def __init__(self, addr_CAN, addr_telem, emmulator=None):
-        super().__init__(addr_CAN, addr_telem, emmulator)
+    def __init__(self, addr_CAN, addr_telem, emulator=None):
+        super().__init__(addr_CAN, addr_telem, emulator)
         # CAN adress data
         if addr_CAN == RL1:
             self.baseFrame = 0x8850225
@@ -94,8 +94,8 @@ class Mitsuba(Message):
     def toCharArray(self):
         pass
     def sendCAN(self, data, addr):
-        if self.emmulator != None:
-            self.emmulator.sendCAN(data, addr, True, False)
+        if self.emulator != None:
+            self.emulator.sendCAN(data, addr, True, False)
         else:
             raise NotImplementedError
     def receiveCAN(self, data):

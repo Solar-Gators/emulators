@@ -8,21 +8,21 @@ import time
 import threading
 
 # Configure DAD board to emmulate the CAN bus
-emmulator = DAD()
-emmulator.CAN_init(baudRate=500e3)
+emulator = DAD()
+emulator.CAN_init(baudRate=500e3)
 # Turn on 5v to power the CAN tranciver
-emmulator.posSupply_init()
-mc = Mitsuba(0x08F89540, 0x01, emmulator)
-mppt = Proton1(1024, 0x2, emmulator)
-# bms = Orion(0x6B0, 0x1, emmulator)
+emulator.posSupply_init()
+mc = Mitsuba(0x08F89540, 0x01, emulator)
+mppt = Proton1(1024, 0x2, emulator)
+bms = Orion(0x6B0, 0x1, emulator)
 
-# bmsThread = threading.Timer(0.1, bms.sendCAN)
-# bmsThread.daemon = True
-# bmsThread.start()
+bmsThread = threading.Timer(0.1, bms.sendCAN)
+bmsThread.daemon = True
+bmsThread.start()
 
 cb = {mc.addr_CAN: mc.receiveCAN, mppt.addr_CAN: mppt.receiveCAN}
 try:
     while True:
-        emmulator.receiveCAN(cb)
+        emulator.receiveCAN(cb)
 except KeyboardInterrupt:
     print("Quitting...")
