@@ -5,7 +5,8 @@ from .Message import Message
 # Emmulates the main AUX steering board
 class AuxSteering(Message):
     def __init__(self, addr_CAN, addr_telem, emulator=None):
-        super.__init__(addr_CAN, addr_telem)
+        super().__init__(addr_CAN, addr_telem)
+        self.emulator = emulator
         self.cplusOn = 0
         self.cminusOn = 0
         self.hornOn = 0
@@ -15,7 +16,7 @@ class AuxSteering(Message):
         self.rightOn = 0
         self.headlightsOn = 0
     def toCharArray(self):
-        output = []
+        output = [0]
         output[0] |= self.hazardsOn << 0
         output[0] |= self.headlightsOn << 1
         output[0] |= self.leftOn << 2
