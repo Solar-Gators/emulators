@@ -19,7 +19,6 @@ class Orion(Message):
         for name in self.__dict__.items():
             if name[0].startswith("addr") or name[0].startswith("emulator"):
                 continue
-            print(name[0])
             temp = int(name[1]*100)
             r.append(temp & 0xFF)
             r.append((temp >> 8) & 0xFF)
