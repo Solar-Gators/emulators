@@ -100,6 +100,14 @@ class DAD():
         """
         self.__UART.send(data)
 
+    def receiveUART(self, cb):
+        """
+        Handle recevied UART data
+        """
+        data = self.__UART.receive()
+        if data.value.decode('utf-8') != "":
+            print(data.value.decode('utf-8'))
+    
     def sendCAN(self, data, ID, isExtended=0, isRemote=0, channel = 0):
         """
         Sends the given data given the parameters.

@@ -8,6 +8,7 @@ class UART(Protocol):
         self.dwf = dwf
         self.hdwf = hdwf
         self.cRX = ctypes.c_int(0)
+        self.fParity = ctypes.c_int(parity)
 
         dwf.FDwfDigitalUartRateSet(hdwf, ctypes.c_double(baudrate)) # 9.6kHz
         dwf.FDwfDigitalUartTxSet(hdwf, ctypes.c_int(tx)) # TX = DIO-0
