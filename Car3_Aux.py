@@ -1,9 +1,6 @@
 import ctypes
 import random
 from DAD.DAD import DAD
-from Mocks.Mitsuba import Mitsuba
-from Mocks.Proton1 import Proton1
-from Mocks.Orion import Orion
 from Mocks.Steering import AuxSteering
 import time
 import threading
@@ -26,7 +23,6 @@ bmsThread = threading.Timer(0.1, bms.sendCAN)
 bmsThread.daemon = True
 bmsThread.start()
 
-cb = {mc.addr_CAN: mc.receiveCAN, mppt.addr_CAN: mppt.receiveCAN}
 try:
     while True:
         emulator.receiveCAN(cb)
