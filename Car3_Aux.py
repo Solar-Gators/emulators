@@ -10,19 +10,13 @@ emulator = DAD()
 emulator.CAN_init(baudRate=500e3)
 # Turn on 5v to power the CAN tranciver
 emulator.posSupply_init()
-mc = Mitsuba(0x08F89540, 0x01, emulator)
-mppt = Proton1(1024, 0x2, emulator)
-bms = Orion(0x6B0, 0x1, emulator)
 steering = AuxSteering(1, 1, emulator)
 
 auxThread = threading.Timer(1, steering.sendCAN)
 auxThread.daemon = True
 auxThread.start()
 
-bmsThread = threading.Timer(0.1, bms.sendCAN)
-bmsThread.daemon = True
-bmsThread.start()
-
+cb = {steering.addr_CAN: steering.receiveCAN, steering.addr_CAN: steering.receiveCAN}
 try:
     while True:
         emulator.receiveCAN(cb)
