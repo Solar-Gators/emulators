@@ -53,7 +53,7 @@ class CAN(Protocol):
         #                         HDWF       *ID                *Extended                *Remote                *DLC                *rgRX  cRX                                 *Status
         self.dwf.FDwfDigitalCanRx(self.hdwf, ctypes.byref(vID), ctypes.byref(fExtended), ctypes.byref(fRemote), ctypes.byref(cDLC), rgbRX, ctypes.c_int(ctypes.sizeof(rgbRX)), ctypes.byref(vStatus)) 
         if vStatus.value != 0:
-            # print("RX: "+('0x{:08x}'.format(vID.value)) +" "+("Extended " if fExtended.value!=0 else "")+("Remote " if fRemote.value!=0 else "")+"DLC: "+str(cDLC.value))
+            print("RX: "+('0x{:08x}'.format(vID.value)) +" "+("Extended " if fExtended.value!=0 else "")+("Remote " if fRemote.value!=0 else "")+"DLC: "+str(cDLC.value))
 
             if self._checkError(vStatus.value):
                 return

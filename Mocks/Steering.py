@@ -7,14 +7,14 @@ class AuxSteering(Message):
     def __init__(self, addr_CAN, addr_telem, emulator=None):
         super().__init__(addr_CAN, addr_telem)
         self.emulator = emulator
+        self.hazardsOn = 0
+        self.headlightsOn = 0
+        self.leftOn = 0
+        self.rightOn = 0
         self.cplusOn = 0
         self.cminusOn = 0
         self.hornOn = 0
         self.regenOn = 0
-        self.hazardsOn = 0
-        self.leftOn = 0
-        self.rightOn = 0
-        self.headlightsOn = 0
     def toCharArray(self):
         output = [0]
         output[0] |= self.hazardsOn << 0
@@ -33,3 +33,6 @@ class AuxSteering(Message):
             self.emulator.sendCAN(self.toCharArray(), self.addr_CAN, False, False)
         else:
             raise NotImplementedError
+    def receiveCAN(self, data):
+        print("Mitsuba Data: "+(" ".join("0x{:02x}".format(c) for c in data)))
+        #data is list of bytes
