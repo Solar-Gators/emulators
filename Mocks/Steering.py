@@ -9,12 +9,12 @@ class AuxSteering(Message):
         self.emulator = emulator
         self.cplusOn = 0
         self.cminusOn = 0
-        self.hornOn = 0
+        self.hornOn = 1
         self.regenOn = 0
-        self.hazardsOn = 0
-        self.leftOn = 0
-        self.rightOn = 0
-        self.headlightsOn = 0
+        self.hazardsOn = 1
+        self.leftOn = 1
+        self.rightOn = 1
+        self.headlightsOn = 1
     def toCharArray(self):
         output = [0]
         output[0] |= self.hazardsOn << 0

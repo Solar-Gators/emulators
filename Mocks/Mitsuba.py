@@ -1,3 +1,4 @@
+from time import sleep
 from .Message import Message
 # address for rtr to motor
 RL1 = 0x8F89540
@@ -96,6 +97,15 @@ class Mitsuba(Message):
     def sendCAN(self, data, addr):
         if self.emulator != None:
             self.emulator.sendCAN(data, addr, True, False)
+        else:
+            raise NotImplementedError
+    def sendCANout(self):
+        if self.emulator != None:
+            self.sendCAN(self.toFrame0(), self.baseFrame)
+            sleep(2)
+            self.sendCAN(self.toFrame1(), self.baseFrame+0x100000)
+            sleep(2)
+            # self.sendCAN(self.toFrame2(), self.baseFrame+0x200000)
         else:
             raise NotImplementedError
     def receiveCAN(self, data):
