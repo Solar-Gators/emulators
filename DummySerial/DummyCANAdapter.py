@@ -41,8 +41,8 @@ class DummyCANAdapter():
         #     print("Invalid baud rate")
         #     quit()
         print("Configuring Dummy CANAdapter...")
-        if not self.port.is_open:
-            self.port.open()
+        # if not self.port.is_open:
+        #     self.port.open()
     #     self.setTimeStamp()
     #     self.setBaudRate()
     #     self.openCANChannel()
@@ -68,12 +68,13 @@ class DummyCANAdapter():
     #         print("Failed to open CAN channel")
     #         quit()
 
-    def isOpen(self):
-        return self.port.is_open
+    # def isOpen(self):
+    #     return self.port.is_open
     def close(self):
         #ser.write(b'C\r')
-        if self.port.is_open:
-            self.port.close()
+        # if self.port.is_open:
+        #     self.port.close()
+        os.close(self.port)
         os.close(self.master)
     def send(self, addr, data, isExtended):
         if(isExtended!=0):
@@ -86,7 +87,8 @@ class DummyCANAdapter():
     def sendExtendedFrame(self, addr, data):
         temp = str('x{}{}{}\r'.format(str(hex(addr))[2:],len(data),listToString(data)))
         print("Sending: " + temp)
-        self.port.write(temp.encode('utf-8'))
+        # self.port.write(temp.encode('utf-8'))
+        os.write(self.master, temp.encode('utf-8'))
         # x = str(os.read(self.master, 2))
         # x = int(x[4:-1], 16)
         # if x != 6:
@@ -96,7 +98,8 @@ class DummyCANAdapter():
         temp = str('t{}{}{}\r'.format(str(hex(addr))[2:],len(data),listToString(data)))
         #y = b't3CF411223344\r'
         print("Sending: " + str(temp))
-        self.port.write(temp.encode('utf-8'))
+        # self.port.write(temp.encode('utf-8'))
+        os.write(self.master, temp.encode('utf-8'))
         # x = str(os.read(self.master, 100))
         # print("Sent: "+x)
         # ser.write(b't3CF411223344\r')

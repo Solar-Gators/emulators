@@ -49,19 +49,27 @@ class DummySerial():
         self.__I2C = None
         self.__SPI = None
         #self.adapter = None
-        master,slave = os.openpty() #open the pseudoterminal
-        print("minicom -D %s" % os.ttyname( slave ))
+        master,slave = pty.openpty() #open the pseudoterminal pair
         s_name = os.ttyname(slave)   #translate the slave fd to a filename
-        m_name = os.ttyname(master)  #translate the slave fd to a filename  
+        m_name = os.ttyname(master)  #translate the slave fd to a filename
+
         print ("Slave name is: " , s_name, " | Slave FD is: " , slave)
         print ("Master name is: ", m_name, " | Master FD is: " , master)
         print("To test: minicom -H -w -D %s" % s_name)
+        print("To run DFLD, edit file Station.ini and replace Device by Device=%s" % s_name)
+
+        print("minicom -D %s" % os.ttyname( slave ))
+        # s_name = os.ttyname(slave)   #translate the slave fd to a filename
+        # m_name = os.ttyname(master)  #translate the slave fd to a filename  
+        # print ("Slave name is: " , s_name, " | Slave FD is: " , slave)
+        # print ("Master name is: ", m_name, " | Master FD is: " , master)
+        # print("To test: minicom -H -w -D %s" % s_name)
         # tty.setraw(master, termios.TCSANOW)
         print("Connect to:", os.ttyname(slave))
         # s_name = os.ttyname(slave) #translate the slave fd to a filename
-        print(s_name)
-        print(os.ttyname(master))
-        ser = Serial(s_name, baudrate, timeout=1)
+        # print(s_name)
+        # print(os.ttyname(master))
+        # ser = Serial(s_name, baudrate, timeout=1)
 
         iflag  = 0
         oflag  = 1
@@ -90,7 +98,7 @@ class DummySerial():
         flags |= os.O_NONBLOCK               
         fcntl.fcntl(master, fcntl.F_SETFL, flags)
 
-        self.adapter = DummyCANAdapter(ser, master, baudrate, False)
+        self.adapter = DummyCANAdapter(slave, master, baudrate, False)
         print("\nEHEHGEHH\n")
 
         if sys.platform.startswith("win"):
@@ -110,9 +118,9 @@ class DummySerial():
       #f.dwf.FDwfDeviceConfigOpen(ctypes.c_int(-1), ctypes.c_int(3), ctypes.byref(self.hdwf))
 
         # Check to see if the device was opened
-        if self.adapter.isOpen==False:
-            print("failed to open device")
-            quit()
+        # if self.adapter.isOpen==False:
+        #     print("failed to open device")
+        #     quit()
             
         # thread = threading.Thread(target=listener, args=[master])
         # thread.start()
