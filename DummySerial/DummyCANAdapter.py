@@ -88,7 +88,7 @@ class DummyCANAdapter():
         temp = str('x{}{}{}\r'.format(str(hex(addr))[2:],len(data),listToString(data)))
         print("Sending: " + temp)
         # self.port.write(temp.encode('utf-8'))
-        os.write(self.master, temp.encode('utf-8'))
+        os.write(self.master, str("0xFF").encode('utf-8')+temp.encode('utf-8')+str("0x3F").encode('utf-8'))
         # x = str(os.read(self.master, 2))
         # x = int(x[4:-1], 16)
         # if x != 6:
@@ -97,9 +97,9 @@ class DummyCANAdapter():
     def sendFrame(self, addr, data):
         temp = str('t{}{}{}\r'.format(str(hex(addr))[2:],len(data),listToString(data)))
         #y = b't3CF411223344\r'
-        print("Sending: " + str(temp))
+        print("Sending: " + str(bytes.fromhex('FF')+temp.encode('utf-8')+bytes.fromhex('3F')))
         # self.port.write(temp.encode('utf-8'))
-        os.write(self.master, temp.encode('utf-8'))
+        os.write(self.master, bytes.fromhex('FF')+temp.encode('utf-8')+bytes.fromhex('3F'))
         # x = str(os.read(self.master, 100))
         # print("Sent: "+x)
         # ser.write(b't3CF411223344\r')
