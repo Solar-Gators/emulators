@@ -11,6 +11,21 @@ def listToString(s):
     for ele in s:
         r += "{0:02x}".format(ele)
     return r
+def sToString(s):
+    r = ""
+    for ele in s:
+        r += "{0:02x}".format(ele)
+    return r
+def strToHex(s):
+    # print(s)
+    result=b''
+    for i in range(0, len(s), 2):
+        # print(s[i : i + 2])
+        # print(bytes.fromhex(s[i : i + 2]))
+        result+=(bytes.fromhex(s[i : i + 2]))
+    # print(result)
+    return result
+
 class DummyCANAdapter():
     def __init__(self, port, master, baudRate=2400, timeStamp = False):
         self.timeStamp = timeStamp
@@ -85,21 +100,32 @@ class DummyCANAdapter():
         #     print("Invalid address")
         #     quit()
     def sendExtendedFrame(self, addr, data):
-        temp = str('x{}{}{}\r'.format(str(hex(addr))[2:],len(data),listToString(data)))
-        print("Sending: " + temp)
+        temp = str('58{}{}{}\r'.format(
+            (str(str(hex(addr))[2:]).zfill(2)),
+            (str(str(hex(len(data)))[2:]).zfill(2)),
+            listToString(data))
+            )
+        print(strToHex(str(str(hex(len(data)))[2:]).zfill(2)))
+        print("Sending: " + str(temp))
         # self.port.write(temp.encode('utf-8'))
-        os.write(self.master, str("0xFF").encode('utf-8')+temp.encode('utf-8')+str("0x3F").encode('utf-8'))
+        os.write(self.master, bytes.fromhex('FF')+strToHex(temp)+bytes.fromhex('3F'))
         # x = str(os.read(self.master, 2))
         # x = int(x[4:-1], 16)
         # if x != 6:
         #     print("Failed to send extended frame")
         #     quit()
     def sendFrame(self, addr, data):
-        temp = str('t{}{}{}\r'.format(str(hex(addr))[2:],len(data),listToString(data)))
+        temp = str('54{}{}{}\r'.format(
+            (str(str(hex(addr))[2:]).zfill(2)),
+            (str(str(hex(len(data)))[2:]).zfill(2)),
+            listToString(data))
+            )
         #y = b't3CF411223344\r'
-        print("Sending: " + str(bytes.fromhex('FF')+temp.encode('utf-8')+bytes.fromhex('3F')))
+        # print((str(hex(addr))[2:]).zfill(2))
+        # print(temp)
+        print("Sending: " + str(temp))
         # self.port.write(temp.encode('utf-8'))
-        os.write(self.master, bytes.fromhex('FF')+temp.encode('utf-8')+bytes.fromhex('3F'))
+        os.write(self.master, bytes.fromhex('FF')+strToHex(temp)+bytes.fromhex('3F'))
         # x = str(os.read(self.master, 100))
         # print("Sent: "+x)
         # ser.write(b't3CF411223344\r')
