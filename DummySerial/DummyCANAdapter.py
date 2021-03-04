@@ -106,6 +106,9 @@ class DummyCANAdapter():
             listToString(data))
             )
         print(strToHex(str(str(hex(len(data)))[2:]).zfill(2)))
+        temp = temp.replace("FF","2FFF");
+        temp = temp.replace("2F","2F2F");
+        temp = temp.replace("3F","2F3F");
         print("Sending: " + str(temp))
         # self.port.write(temp.encode('utf-8'))
         os.write(self.master, bytes.fromhex('FF')+strToHex(temp)+bytes.fromhex('3F'))
@@ -123,6 +126,9 @@ class DummyCANAdapter():
         #y = b't3CF411223344\r'
         # print((str(hex(addr))[2:]).zfill(2))
         # print(temp)
+        temp = temp.replace("FF","2FFF");
+        temp = temp.replace("2F","2F2F");
+        temp = temp.replace("3F","2F3F");
         print("Sending: " + str(temp))
         # self.port.write(temp.encode('utf-8'))
         os.write(self.master, bytes.fromhex('FF')+strToHex(temp)+bytes.fromhex('3F'))
